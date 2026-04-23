@@ -265,6 +265,39 @@ I do not debug single failures. If a behavior happens once and never again, I lo
 
 The debugging techniques in this post are not clever. They are the tracing and replay patterns that distributed-systems engineers have used for two decades, applied to a new kind of system. The novelty is in what to trace (the message list, the tool call sequence, the budget) and what kinds of failures are common (silent looping, double-encoding, dict-order drift). The mechanics are old, and old mechanics are the ones that work under pressure.
 
+## Section 10: a worked example, end to end
+
+To make the techniques concrete, here is a real (anonymized) investigation from last week. Symptom: the agent appeared to "freeze" at turn 14, emitting the same `read_file` call against the same path for six turns in a row before the budget killed it.
+
+Step one, pull the tape. The run id was in the orchestrator's stdout, so I had the tape file immediately. Step two, run the turn summary against the tape:
+
+```python
+from pathlib import Path
+import json
+
+for line in Path.home().joinpath(".cache/agent-tapes/3f9b2e1c.jsonl").read_text().splitlines():
+    rec = json.loads(line)
+    if rec["kind"] == "model_response":
+        names = [b.get("name") for b in rec["payload"].get("content", []) if isinstance(b, dict) and b.get("type") == "tool_use"]
+        print(f"t{rec['turn']:03d} tools={names}")
+```
+
+The output showed the loop starting at turn 14. Step three, diff turn 14's request against turn 15's request. Almost identical, except turn 15's messages list contained an extra tool result. The tool result content was the empty string. Step four, look at the tape line for that tool result directly:
+
+```python
+for line in Path.home().joinpath(".cache/agent-tapes/3f9b2e1c.jsonl").read_text().splitlines():
+    rec = json.loads(line)
+    if rec["kind"] == "tool_result" and rec["turn"] >= 14:
+        print(rec["payload"])
+        break
+```
+
+The result was `{"name": "read_file", "result": ""}`. The file existed, was non-empty, and the agent had read it successfully on turn 5. Why was it returning empty now? Step five, look at the arguments to the call:
+
+The path on turn 14 had a leading space. The agent had constructed it by concatenating two strings, one of which had drifted to include a space prefix. My `read_file` tool was using `Path(p).read_text()`, which on macOS with a leading space silently returns nothing for a path that does not exist (the exception was being swallowed by an over-broad `except` upstream). Two fixes: strip whitespace at the tool boundary, narrow the exception handler to `FileNotFoundError`. Total time from "agent is broken" to "shipped fix": about 12 minutes. Without the tape, this would have been an afternoon of guessing.
+
+The reason the techniques work together is that each one narrows the search space in a different dimension. The summary narrows by time (which turn). The diff narrows by content (what changed). The tape line narrows by structure (what fields the change touched). Pick the wrong dimension first and you waste time. Have all three available and the investigation is mechanical.
+
 ## References
 
 - Anthropic messages API reference: https://docs.anthropic.com/en/api/messages
