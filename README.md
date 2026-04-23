@@ -15,6 +15,8 @@ Technical notes from running AI-native dev workflows daily — terminal coding a
 - [Five tasks where coding agents make things worse](posts/2026-04-23-when-to-not-use-an-agent.md)
 - [Architecture deep-dive: openai/codex](posts/2026-04-23-architecture-openai-codex.md)
 - [Architecture deep-dive: Aider-AI/aider](posts/2026-04-23-architecture-aider-ai-aider.md)
+- [Architecture deep-dive: OpenHands/OpenHands](posts/2026-04-23-architecture-openhands-openhands.md)
+- [Architecture deep-dive: BerriAI/litellm](posts/2026-04-23-architecture-berriai-litellm.md)
 - [Day 0 recap: what shipped in the first hours of the 1B/day experiment](posts/2026-04-23-the-1b-tokens-per-day-experiment-day-0-recap.md)
 
 ## Cadence
