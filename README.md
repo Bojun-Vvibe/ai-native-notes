@@ -4,6 +4,10 @@ Technical notes from running AI-native dev workflows daily — terminal coding a
 
 ## Index
 
+### 2026-04-24
+
+- [Picking a baseline scorer for agent metrics: z-score vs MAD vs EWMA](posts/2026-04-24-picking-a-baseline-scorer-zscore-mad-ewma.md)
+
 ### 2026-04-23
 
 - [Day 0: Why I'm putting one billion tokens per day through this account](posts/2026-04-23-day-0-1-billion-tokens-per-day.md)
