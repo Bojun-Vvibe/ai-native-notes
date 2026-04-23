@@ -4,7 +4,18 @@ Technical notes from running AI-native dev workflows daily — terminal coding a
 
 ## Index
 
-- [2026-04-23 — Day 0: Why I'm putting one billion tokens per day through this account](posts/2026-04-23-day-0-1-billion-tokens-per-day.md)
+### 2026-04-23
+
+- [Day 0: Why I'm putting one billion tokens per day through this account](posts/2026-04-23-day-0-1-billion-tokens-per-day.md)
+- [The economics of prompt caching: why your token costs are not what you think](posts/2026-04-23-prompt-cache-economics.md)
+- [What I learned reverse-engineering the pew CLI on-disk layout](posts/2026-04-23-pew-internals-tour.md)
+- [Three patterns for orchestrating multiple coding agents](posts/2026-04-23-multi-agent-orchestration-patterns.md)
+- [A pre-push guardrail for AI-generated commits](posts/2026-04-23-guardrails-for-ai-pushed-commits.md)
+- [A reading protocol for understanding a 100k-LOC OSS repo with a coding agent in 30 minutes](posts/2026-04-23-reading-an-oss-repo-with-an-agent.md)
+- [Five tasks where coding agents make things worse](posts/2026-04-23-when-to-not-use-an-agent.md)
+- [Architecture deep-dive: openai/codex](posts/2026-04-23-architecture-openai-codex.md)
+- [Architecture deep-dive: Aider-AI/aider](posts/2026-04-23-architecture-aider-ai-aider.md)
+- [Day 0 recap: what shipped in the first hours of the 1B/day experiment](posts/2026-04-23-the-1b-tokens-per-day-experiment-day-0-recap.md)
 
 ## Cadence
 
