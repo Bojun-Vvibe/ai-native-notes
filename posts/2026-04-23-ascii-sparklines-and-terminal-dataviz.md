@@ -304,6 +304,30 @@ print(fmt("attempt",     field(LOG, "attempt"),  ""))
 
 That is the dashboard. Ten lines of useful output, regenerated in under 50 ms, no browser, no network. The Grafana dashboards still exist for week-over-week trending. For the right-now question, this script is what I look at.
 
+## Section 11: why the terminal wins for "right-now" observability
+
+The browser-based dashboard is not bad. It is, in many ways, technically superior: it can do real interactive zoom, it can render a hundred series at once, it can drive alerting, it can be shared as a URL. None of that matters if you do not look at it. The terminal-based version wins on a different axis, which is friction, and friction is the thing that determines whether observability actually gets used.
+
+Consider the path from "I noticed the agent felt slow" to "I have a chart in front of me." For the browser dashboard, the path is: switch context to browser, find the right tab, wait for the page to load, wait for queries to run against the time-series backend, possibly authenticate again, scroll to the relevant panel, adjust the time range. Even when each step is fast, the sum is 15 to 30 seconds, and the context switch out of the terminal is the expensive part. Every time I do this I lose my place in whatever I was doing.
+
+The terminal version's path is: type three characters and hit return. The chart is in front of me in 50 milliseconds, in the same window I was already working in. There is no context switch. The dashboard is part of the shell, the same way `git status` is.
+
+The cost of this is real. The terminal dashboard cannot do interactive drill-down. It cannot show a chart of arbitrary metrics from arbitrary time ranges. It cannot alert. For those use cases, the browser dashboard is the right tool. But "I want to glance at the system" is the most common observability use case by frequency, and the terminal wins it by an order of magnitude on friction. So that is where I optimized.
+
+The pattern generalizes beyond observability. Any tool whose value depends on being looked at frequently should live where the user already is. That is usually the terminal. The browser is for tools whose value depends on shareability or interactivity, neither of which applies to a private, read-only dashboard.
+
+## Section 12: what to log so the dashboard works
+
+The dashboard is downstream of the log format. If the log is sloppy, the dashboard is sloppy. Three rules I now apply to every log file the agents write:
+
+The first rule: one event per line, JSONL, no exceptions. Multi-line JSON is harder to tail, harder to grep, and harder to truncate safely. The line is the unit.
+
+The second rule: every line has a `ts` field as a Unix timestamp in seconds, and a `kind` field naming the event type. The `ts` field lets time-based filtering be a one-liner. The `kind` field lets you split a single log into multiple sparklines without parsing the rest.
+
+The third rule: numeric fields are flat, not nested. `{"in_tok": 1200}` not `{"usage": {"input_tokens": 1200}}`. The flat shape lets the field-extractor be a single `.get()` call instead of a path traversal. This sounds trivial; it is the difference between a 3-line dashboard script and a 30-line one.
+
+Following these three rules, the dashboard scripts in this post extend to any new metric in two minutes: add a field at the log site, add a row to the dashboard. The lift is constant, not linear, in the number of metrics.
+
 ## References
 
 - Unicode block elements: https://en.wikipedia.org/wiki/Block_Elements
