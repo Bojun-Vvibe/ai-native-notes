@@ -6,6 +6,7 @@ Technical notes from running AI-native dev workflows daily — terminal coding a
 
 ### 2026-04-24
 
+- [Pre-agency LLM CLIs vs agent CLIs: the taxonomic split the agent-CLI conversation keeps eliding](posts/2026-04-24-pre-agency-vs-agency-cli-taxonomy.md)
 - [State machine vs free-form ReAct: a design choice every agent loop is making whether it admits it or not](posts/2026-04-24-state-machine-vs-react-as-an-agent-loop-design-choice.md)
 - [State machine vs free-form ReAct: the architecture choice every agent CLI quietly makes](posts/2026-04-24-state-machine-vs-react-loop-as-an-architecture-choice.md)
 - [Context window budgeting for long-running agents](posts/2026-04-24-context-window-budgeting-for-long-running-agents.md)
