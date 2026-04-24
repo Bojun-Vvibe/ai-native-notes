@@ -5,6 +5,13 @@ tags: [agents, architecture, design, cli, react, state-machine]
 est_reading_time: 11 min
 ---
 
+> Companion piece. An earlier post the same day,
+> [_State machine vs free-form ReAct: the architecture choice every agent CLI quietly makes_](2026-04-24-state-machine-vs-react-loop-as-an-architecture-choice.md),
+> walks through the two loop shapes from the ReAct paper definition onward and is the better entry point if the
+> distinction is new to you. This post assumes you already know what a ReAct loop and a state machine are, and
+> instead focuses on (a) three diagnostics for telling which shape a CLI is from the source rather than the README,
+> and (b) two operational rules for picking and tuning the shape.
+
 ## The problem
 
 I've spent the last week reading the source of six agent CLIs back-to-back
