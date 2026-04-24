@@ -6,6 +6,9 @@ Technical notes from running AI-native dev workflows daily — terminal coding a
 
 ### 2026-04-24
 
+- [State machine vs free-form ReAct: a design choice every agent loop is making whether it admits it or not](posts/2026-04-24-state-machine-vs-react-as-an-agent-loop-design-choice.md)
+- [Context window budgeting for long-running agents](posts/2026-04-24-context-window-budgeting-for-long-running-agents.md)
+- [Why your AI agent should write to JSONL, not SQLite](posts/2026-04-24-why-your-ai-agent-should-write-to-jsonl-not-sqlite.md)
 - [EWMA in logit space, not raw space, for bounded ratio metrics](posts/2026-04-24-ewma-in-logit-space-for-bounded-ratios.md)
 - [Four bug shapes that keep showing up in agent infrastructure](posts/2026-04-24-four-bug-shapes-from-this-weeks-pr-reviews.md)
 - [Picking a baseline scorer for agent metrics: z-score vs MAD vs EWMA](posts/2026-04-24-picking-a-baseline-scorer-zscore-mad-ewma.md)
