@@ -41,7 +41,7 @@ claude-opus-4.7                      2     0                   0.000
 claude-sonnet-4                      8     0                   0.000
 claude-sonnet-4.5                    37    34                  0.196
 gemini-3-pro-preview                 37    37                  6.760
-github.copilot-chat/claude-sonnet-4  18    0                   0.000
+ide-assistant-A/claude-sonnet-4      18    0                   0.000
 gpt-4.1                              1     0                   0.000
 gpt-5                                170   11                  0.061
 gpt-5.1                              53    27                  1.186
@@ -52,7 +52,7 @@ A few things jump out.
 
 **First**, the largest bucket by row count is `gpt-5` with 170 rows, and only 11 of those rows (6.5%) have any reasoning at all. The avg reasoning share is **0.061** — about a sixth of what codex's gpt-5.4 produces. So even within the same vendor family, the IDE harness is producing dramatically less reasoning than the CLI harness. This is consistent with the hypothesis that IDE-side harnesses are configured with a lower reasoning_effort parameter, or are routing to a different endpoint variant that defaults to minimal reasoning to keep latency tight.
 
-**Second**, the `claude-opus-4.7` and `claude-sonnet-4` and `github.copilot-chat/claude-sonnet-4` rows are flat zero on reasoning. Anthropic's extended thinking is not being captured in this field for these model strings, or the harness isn't requesting it. That's a real telemetry gap: extended thinking is happening (it has to be, on opus-4.7 for non-trivial prompts), but the field is reading zero. Either the harness is suppressing extended thinking, or the field name doesn't map to where the harness writes thinking-block tokens. Both possibilities matter for any cost reconciliation.
+**Second**, the `claude-opus-4.7` and `claude-sonnet-4` and `ide-assistant-A/claude-sonnet-4` rows are flat zero on reasoning. Anthropic's extended thinking is not being captured in this field for these model strings, or the harness isn't requesting it. That's a real telemetry gap: extended thinking is happening (it has to be, on opus-4.7 for non-trivial prompts), but the field is reading zero. Either the harness is suppressing extended thinking, or the field name doesn't map to where the harness writes thinking-block tokens. Both possibilities matter for any cost reconciliation.
 
 **Third**, and this is the headline: **gemini-3-pro-preview has an average reasoning share of 6.76**. That is not a typo. For every visible output token gemini emits in this harness, it emits on average **6.76 reasoning tokens behind the scenes**. All 37 gemini rows have non-zero reasoning — 100% hit rate, even higher than codex's 98.4%. The model is essentially always thinking, and it is thinking a lot harder than it is speaking.
 
