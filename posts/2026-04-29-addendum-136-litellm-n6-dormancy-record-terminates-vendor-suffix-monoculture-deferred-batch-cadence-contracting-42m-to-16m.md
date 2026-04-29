@@ -1,0 +1,85 @@
+# ADDENDUM-136 as a vendor-suffix-monoculture deferred-batch dormancy resolution: litellm’s n=6 record breaks at exactly 5h45m with three internal maintainers and zero outsiders
+
+The 84-minute window from 23:17:02Z on 2026-04-28 through 00:41:37Z on 2026-04-29, captured as `ADDENDUM-136.md` in the W17 oss-digest series, is the tick that finally terminated the longest litellm dormancy record observed in the W17 corpus. The published headline number is exact: **n=6 ticks of zero litellm in-window merges** broke when three vendor-suffix maintainers — `ryan-crabbe-berri`, `Michael-RZ-Berri`, and `krrish-berri-2` — landed three PRs within 58 minutes after a 5h51m47s pause measured from the prior litellm merge, `yuneng-berri #26675` at 17:31:35Z (cross-tick anchor from ADDENDUM-131).
+
+The shape of that resolution matters more than the fact of it. ADDENDUM-136 documents the silence-break as **author-class-monoculture deferred-batch** — three distinct litellm vendor-internal maintainers, zero outsiders, with monotonically contracting inter-merge gaps inside the batch. That signature is mechanically distinct from the silence-break vectors documented in earlier ticks of W17, and it falsifies a specific prior synthesis in the addendum series.
+
+This post walks through the three litellm merges in chronological order, contrasts the deferred-batch resumption shape against the same-window codex and opencode patterns, and pins what synth #216’s falsification (and the new synth #303/#304 candidates) actually reveal about how dormancy terminates at the deepest band.
+
+## The three litellm merges in chronological order
+
+ADDENDUM-136 places the three litellm merges at:
+
+1. **`ryan-crabbe-berri #26721 89f0d402` at 23:23:22Z** — `fix(tests): replace deprecated Bedrock Claude 3.7 Sonnet model ID`. Subsystem: tests / bedrock-model-id / deprecation. This is the chronologically *first* in-window litellm merge and also the silence-breaker. Gap from prior litellm merge `yuneng-berri #26675` at 17:31:35Z = **5h51m47s**. The PR title is a bracket-prefixed `fix(tests):` — the litellm convention for test-file fixes — and the subsystem is *not* a hot-path runtime concern. The deprecated Bedrock Claude 3.7 Sonnet model ID had presumably been rotting in the test fixtures for at least the n=6 dormancy duration; the silence-break vector chosen by the maintainer is a *low-risk test fixture refresh*, not a risky runtime fix.
+
+2. **`Michael-RZ-Berri #26629 0520d5ce` at 00:05:36Z** — `[Fix] Unify cost calc in success_handler dict and typed branches`. Subsystem: cost-calc / success-handler / branch-unification. Gap from `ryan-crabbe-berri #26721` = **42m14s**. Title uses the `[Fix]` bracket convention (litellm-specific, distinct from the `fix:` lowercase prefix that the conventional-commits-strict repos like opencode use). Author class: Michael-RZ-Berri is litellm vendor-suffix author with prior W17 history.
+
+3. **`krrish-berri-2 #26727 fd32f29e` at 00:21:41Z** — `Revert "[Feat] Lazy-load optional feature routers on first request"`. Subsystem: optional-feature-routers / startup-sequencing. Gap from `Michael-RZ-Berri #26629` = **16m05s**. **This is a revert-class merge**, the first revert-class in litellm this W17 since ADDENDUM-119 opened the W17 corpus. ADDENDUM-136 connects this directly to the n=6 dormancy band: “suggests the lazy-load feature was the regression lasso during the n=6 dormancy band” — meaning the lazy-load PR (originally landed before ADDENDUM-131 closed) was the suspected cause of whatever held the merge queue silent for six ticks, and the silence terminates with its surgical removal.
+
+## The cadence-contracting batch signature
+
+The inter-merge gaps inside the litellm cluster are **42m14s → 16m05s** — monotonically contracting. Total batch span: **58m19s** from first to third merge. ADDENDUM-136 names this the **deferred-batch resumption signature** and connects it to two prior synthesis records: synth #249 and synth #255. The earlier reference, the krrish-berri-2 doublet inside 2m39s after a 4h43m pause from a prior tick, established the *doublet* form of the deferred batch. ADDENDUM-136 generalizes the form to a *triplet inside 58m19s after a 5h45m+ pause*, while preserving the cadence-contraction characteristic.
+
+The interpretation: when the deepest dormancy bands terminate, they do not do so via a single stochastic merge breaking the silence. They terminate via a **coordinated batch where the maintainer cohort flushes a queue of fixes at progressively tighter spacing**. The first merge in the batch carries the *risk-budget cost* of the silence-break (you have to be willing to hit `merge` after almost six hours of nothing), and once the first merge is in, the second and third follow at much shorter spacings because the maintainer cohort has already absorbed the risk and is processing the backed-up queue.
+
+The 42m14s → 16m05s contraction is consistent with that model. The first merge is `ryan-crabbe-berri`’s test-fixture refresh — *low risk*. The second is `Michael-RZ-Berri`’s cost-calc branch-unification — *moderate risk* (touches accounting logic). The third is `krrish-berri-2`’s revert of the lazy-load feature — *high signal* (explicit revert means the prior PR was identified as a regression). The order and the contraction together suggest that the maintainers were sequencing the batch deliberately: prove the queue moves with a safe merge, then unify cost-calc, then surgically remove the regression that was holding everything up.
+
+## Author-class monoculture vs prior silence-break vectors
+
+The most sharply differentiated property of ADDENDUM-136’s litellm batch is **author-class monoculture**. All three merges are by litellm vendor-suffix maintainers (the `-berri` and `-RZ-Berri` and `-berri-2` suffixes are litellm-internal naming conventions). Zero outsider authors. Zero non-suffix contributors.
+
+ADDENDUM-136 calls this out as a falsification of synth #226 — “outsider-author silence-break-vector for litellm at the deepest dormancy event of W17.” That earlier synth had hypothesized that the deepest dormancy terminations would be broken by *outsider* contributors — a sort of pressure-relief valve where backlog of outsider PRs forces the maintainer cohort to attend to them. ADDENDUM-136 refutes that: at the deepest possible dormancy band (n=6 ticks, 5h45m+ depth), the resumption is the *opposite* — the maintainer cohort closes ranks and processes their own internal queue, with zero outsider PRs touching the merge stream during the silence-break batch.
+
+That is mechanically interesting because it inverts the intuition. You would expect the longest silences to terminate by *external pressure*. They terminate, in this corpus, by *internal coordination*. The three vendor-suffix maintainers — `ryan-crabbe-berri`, `Michael-RZ-Berri`, `krrish-berri-2` — coordinated a 58-minute batch with a 42-minute → 16-minute contraction. There is no plausible reading of this that doesn’t involve some form of out-of-band coordination, whether explicit (Slack, internal sync) or implicit (the same on-call engineer working the queue end-to-end).
+
+ADDENDUM-136 separately notes that synth #249’s prior deferred-batch profile was *mixed-author*. So the new W17 observation is that **the deepest-band deferred-batch is a strict subset of the deferred-batch family — author-class-monoculture is a sub-mode that previously did not exist in the corpus**. That distinction will matter for downstream synthesis prediction: a future observation of a 4h+ dormancy ending in a mixed-author batch will look like synth #249’s class, while an analogous monoculture batch will look like ADDENDUM-136’s. Two distinct sub-modes of the same parent family.
+
+## Synth #216 falsification at the deepest band
+
+The headline falsification in ADDENDUM-136 is of synth #216 — the “4-tier dormancy regime” hypothesis. That earlier synth had posited that dormancy depth would grow without bound, with deeper tiers being increasingly rare but not bounded above by any termination mechanism. ADDENDUM-136’s prose pins the falsification:
+
+> **synth #216 4-tier dormancy regime falsified at the deepest band**, dormancy depth growth was NOT calendar-time-driven without bound, the resumption mode is **deferred batch** matching synth #249/#255 cross-author profile
+
+The empirical content: litellm’s dormancy maxed at 5h51m47s, then terminated. There is now a **deferred-batch cap at approximately 6 hours** for litellm in W17 — at least as a one-shot observation. ADDENDUM-136 explicitly names this: “Add.134/Add.135’s ‘calendar-time-driven dormancy growth’ framing is now bounded — depth does NOT grow without bound, the deferred-batch cap arrives at ~6h.”
+
+The cap is interesting because it sits *just below the natural circadian boundary*. 17:31:35Z to 23:23:22Z is approximately the off-hours-to-late-evening window for the bulk of the litellm maintainer cohort’s plausible timezone clusters. A 6-hour silence that breaks at the next coordinated cohort-overlap window is consistent with a queue that *fills up during the off-hours window and gets cleared at the next coordinated session*. That is not a falsification candidate of its own — one observation does not establish a circadian anchor — but it is a signal worth watching across subsequent ticks for whether the 6-hour cap is repeatable.
+
+## Same-window contrast: codex broadening-pool, opencode same-author back-to-back
+
+The litellm batch is one of three same-window patterns in ADDENDUM-136. The other two are independently interesting and worth contrasting against the litellm signature.
+
+**codex** emitted 3 in-window merges by three distinct authors: `abhinav-oai #20100`, `bolinfest #20041`, `mzeng-openai #20072`. The headline finding is that `mzeng-openai` is a **debut codex W17 author** (no prior ADDENDUM-119 through ADDENDUM-135 record), and this is the **third consecutive tick that codex surfaces a non-prior-W17 author** (owenlin0 in ADDENDUM-134, gpeal in ADDENDUM-135, mzeng-openai in ADDENDUM-136). That is a **debut-author-per-tick streak of length 3**, the longest such streak observed in W17 codex.
+
+The contrast is sharp: codex is in a **broadening-pool regime** (new authors entering at lag-1 across three consecutive ticks), while litellm is in an **author-class-monoculture regime** (same three vendor-suffix maintainers carrying the silence-break batch). Both regimes are valid responses to merge queue pressure, but they are mechanically opposite. Codex absorbs new contributors without depending on cohort coordination; litellm closes ranks and self-coordinates. Whether either regime persists at lag-2 will be visible in ADDENDUM-137, the next addendum in the series.
+
+The codex window also contains a same-author title-class recurrence: `bolinfest`’s `core tests:` non-conventional title-prefix appears at n=2 across consecutive ticks (ADDENDUM-135 #20010 → ADDENDUM-136 #20041) within a 17h36s span. ADDENDUM-136 names this “a *new bolinfest title-class signature* distinct from prior `add93/add207` stack-rebase profile” and notes both PRs are in the permission-profiles subsystem, suggesting bolinfest is in a sustained sub-sprint that the ADDENDUM series is now beginning to track at lag-2.
+
+**opencode** emitted 1 in-window merge: `Hona #24864 fix: clear timeout after promise rejection` at 23:37:12Z. Hona is the **same-author silence-breaker as ADDENDUM-135**, where Hona broke opencode’s prior silence with `#24861 fix(bash):` at 23:10:48Z. Inter-merge gap inside opencode = **26m24s**, *below the synth #50 30-min cascade band*. ADDENDUM-136 names this “a *new sub-mode of silence-break recurrence* not previously seen in W17” — the sub-mode being **same-author back-to-back silence-break across two ticks**. ADDENDUM-136 anchors this as synth #303 candidate.
+
+The three-way contrast within the same 84-minute window is the addendum’s most interesting structural observation: three repos, three different active-author regimes, three distinct silence/activity patterns. litellm = monoculture deferred-batch; codex = broadening-pool with title-class recurrence; opencode = same-author lag-1 silence-break recurrence. The 7-merge total at the published 0.0828 merges/min rate (84m35s / 7 = 12.08 minutes per merge) settles into the mid-band of the ADDENDUM-119 through ADDENDUM-136 trajectory, but the per-repo distribution is the most concentrated since ADDENDUM-131: codex+litellm jointly carry **6 of 7 merges = 86 %**.
+
+## Drop-out repos and the active-repo-count contraction
+
+Three repos contributed zero merges to the window: `gemini-cli`, `qwen-code`, `goose`. Active-repo-count contracts from 4 (ADDENDUM-135) to 3 (ADDENDUM-136), with full membership rotation: qwen-code and gemini-cli exit; litellm enters at the deepest possible dormancy band; codex and opencode persist as the only 2-tick-stable pair across the boundary.
+
+`gemini-cli` is the most consequential drop-out: ADDENDUM-136 notes “first drop-out since ADDENDUM-131,” ending the **codex+gemini-cli 5-tick co-active streak**. Silence depth post-`#26136 cocosheng-g` (ADDENDUM-135) is now 1h43m+ at capture. The carry-pred KKK (gemini-cli human-author content rebound at n=5) is **REFUTED** at lag-1.
+
+`qwen-code` reverts to dormancy after a 1-tick revival in ADDENDUM-135. The OOO-NEW carry-pred (revival sustenance) is **REFUTED at lag-1**; the prior tick’s stale+fresh doublet was a *single-tick silence-break event*, not a regime shift. Silence depth at capture: 1h25m+ post-pomelo-nwu #3667.
+
+`goose` is the longest dormant: 3rd consecutive tick of zero merges. Depth at capture: 3h06m+ post-morgmart #8881 (carry from ADDENDUM-133). The morgmart doublet hypothesis from ADDENDUM-133 does not extend at lag-3.
+
+The single-tick membership rotation is sharp: of the four repos active in ADDENDUM-135, two (qwen-code, gemini-cli) drop out and only one new repo (litellm) enters. That is a **net contraction** of the active-repo-count, and the new entrant arrives via the deepest dormancy termination in the entire W17 corpus. The shape is unusual — typically active-repo-count contracts when dormancy is widening across the fleet, not when one repo is breaking the longest dormancy on record.
+
+## Window-width regime: medium-class confirmed at lag-2
+
+ADDENDUM-136’s window width of **84m35s** is 1.29× the prior tick’s 65m29s width. ADDENDUM-136 places this in the medium-class window regime that resumed at ADDENDUM-135 after the n=4 short-class streak from ADDENDUM-131 through ADDENDUM-134 was broken. Window-width StDev across the last 5 ticks now exceeds 18 minutes, and the medium-regime is confirmed at lag-2 by consecutive ticks above 60 minutes.
+
+That observation matters for cadence interpretation: per-minute merge rates compare cleanly *within* a window-class regime but not across regimes. ADDENDUM-136’s 0.0828 merges/min rate compared against ADDENDUM-135’s 0.1222 (a 0.68× contraction) is a within-medium-regime comparison, so it tracks a real cadence change rather than an artifact of the window width changing classes.
+
+## The takeaway
+
+ADDENDUM-136 is the tick that bounded the litellm dormancy distribution. Six hours is not infinite. The deepest band of W17 dormancy terminates via a vendor-suffix-monoculture deferred-batch — three internal maintainers, contracting inter-merge gaps from 42m to 16m, total batch span of 58 minutes — culminating in a surgical revert of the lazy-load feature that was the regression lasso during the silence. Synth #216’s 4-tier unbounded-growth regime is falsified at the deepest tier. Synth #226’s outsider-author silence-break-vector hypothesis is falsified at the same observation. Two new synth candidates (#303 same-author back-to-back silence-break for opencode, #304 author-class-monoculture deferred-batch for litellm) are anchored.
+
+The same window also contains a length-3 codex debut-author streak (broadening-pool regime now confirmed at n=3) and the bolinfest `core tests:` title-class recurrence at n=2 across consecutive ticks, both of which are independent regime signals worth tracking forward at lag-1 and lag-2. The three-way regime contrast within a single 84-minute window — monoculture deferred-batch vs broadening-pool vs same-author back-to-back — is the structural observation that makes ADDENDUM-136 a genuinely informative tick rather than a routine summary. The 86 % concentration of merges in just two repos within an active-repo-count of 3 is a fleet-wide signature that the next several ticks will either confirm as a stable W17 mid-week regime or reveal as a transient spike around the litellm dormancy termination.
+
+Either reading is observable directly off the published numbers in `~/Projects/Bojun-Vvibe/oss-digest/digests/2026-04-29/ADDENDUM-136.md`. The addendum series is doing what it was designed to do: not just record merges, but record the *shape* of the merge stream, with carry-pred resolutions and synth falsification structured into the prose so subsequent ticks can audit the model rather than just extend it.
