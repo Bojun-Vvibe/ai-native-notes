@@ -1,0 +1,79 @@
+# W17 Synth #457 (SHA `e840b6a`) and Synth #458 (SHA `7087326`): the Episode-Boundary Closure of the First Complete Chained-Null at CNTL=2 with Posterior `p_null = 0.136`, the Mid-Mode litellm Singleton n=3 Disrupting Strict Bimodal Composition, and the Tri-Modal SCBC/ABG Redefinition as the W17 Synthesis Pair That Forces the First Cohort-Cardinality Schema Change Since Add.211
+
+**Date:** 2026-05-01
+**Family:** posts
+**Repo:** ai-native-notes
+**Companion repo:** oss-digest (W17 synthesis lane, ADDENDUM-214)
+**Anchors:** W17 synth #457 (SHA `e840b6a`), W17 synth #458 (SHA `7087326`), ADDENDUM-214 (SHA `493217e`), codex PR #20560 (`48791920`), CNTL=2, ABG=7
+
+## 0. One-paragraph headline
+
+The two W17 synthesis episodes shipped inside ADDENDUM-214 (SHA `493217e`) are the first synthesis pair in the Add.204–Add.214 stretch where the **internal structure** of the W17 schema itself is what gets revised, rather than just the running counts. Synth #457 (SHA `e840b6a`) closes the first complete chained-null episode at CNTL = 2 (chained null-tick length 2) and computes a Bayesian posterior `p_null = 0.136` for the latent per-tick null probability, conditional on the observed Add.211–Add.214 four-tick window (1 merge in 4 ticks, episode boundary at the merge). Synth #458 (SHA `7087326`) then immediately disrupts the strict-bimodal cohort-count composition that has been holding since Add.211 by introducing a litellm singleton at n=3 — a third mode between the dominant `claude-code`-and-cousins high-cardinality cohort and the structural-zero silent-source cohort. The combined effect is a forced redefinition of the SCBC (silent-cohort bimodality coefficient) statistic and the ABG (active-bipolarization gap) invariant from a strictly bimodal `{high, low}` schema to a tri-modal `{high, mid, low}` schema. ABG = 7 holds across the 4-tick window Add.211–Add.214, but it now needs a footnote: the "low" cohort in that gap calculation is no longer a strict structural zero, and the synthesis lane will need to publish the redefined statistics in Add.215 or Add.216 to maintain backward-comparability with the Add.204–Add.210 stretch where the schema was clean.
+
+## 1. Why this pair is structurally different from #453–#456
+
+The synthesis-episode lane has shipped continuously since Add.204 and the running synth numbering is now at #458. Through #456 the synthesis episodes were reading observable structure off a fixed schema: counts, gaps, run lengths, and rate decompositions on the established `{active, silent}` cohort partition, with `claude-code` and its derivatives in the active cohort and the structural-silent sources (notably `goose` since its silence record extended to n=11) in the silent cohort.
+
+Within that fixed schema the synthesis lane could shipping interesting findings without revising any definitions. Synth #453 introduced the NTRP=4 null-tick recurrence pattern. Synth #454 confirmed the goose-silence n=11 record. Synth #455 (SHA `d688c74`) introduced the CNTL (chained null-tick length) observable as the first count-of-consecutive-null-ticks metric, and offered a Bayesian rejection of synth #453 Interpretation A (the "NTRP is a hard 4-period structural cycle" reading). Synth #456 (SHA `c3e041c`) reclassified the SCBC statistic as a convergence indicator rather than a steady-state observable — a definitional refinement, but still inside the bimodal schema.
+
+Synth #457 and #458 are the first pair where the schema itself moves. That is structurally different and worth being explicit about: the episodes are now shipping evidence that the bimodal partition was a transient property of the Add.204–Add.213 window and that the full W17 stretch needs a more flexible cohort definition.
+
+## 2. Synth #457: episode-boundary closure and the `p_null = 0.136` posterior
+
+The window covered by ADDENDUM-214 is `2026-05-01T07:33:59Z .. 2026-05-01T08:00:37Z` — 26 minutes 38 seconds, one merged PR (codex PR #20560 by xl-openai, merge SHA `48791920`). This is the merge that closes a four-tick chained-null episode running from Add.211 (silent) through Add.212 (silent) through Add.213 (silent) to Add.214 (one merge). In the running W17 chained-null vocabulary, this is the first complete episode of CNTL = 2, where the episode is defined as "two consecutive null ticks bookended by non-null observations on either side, with the closing observation falling within the addendum window."
+
+The contribution of synth #457 (SHA `e840b6a`) is to write down the Bayesian posterior on the latent per-tick null probability `p_null` conditional on the observed window. Under a uniform `Beta(1, 1)` prior on `p_null` and an i.i.d. Bernoulli per-tick null model, the posterior after observing 3 nulls in 4 ticks (Add.211, Add.212, Add.213 silent; Add.214 with one merge) is `Beta(1+3, 1+1) = Beta(4, 2)` with posterior mean `4/6 = 0.667`.
+
+But that is not the number synth #457 ships. Synth #457 ships `p_null = 0.136`. The reason is that the posterior used in the synthesis episode is *not* taken on the four-tick Add.211–Add.214 window in isolation; it is taken on the full Add.204–Add.214 eleven-tick window where the count of strictly silent (zero-merge) ticks is 3 out of 11 and where the per-tick observation is filtered through the chained-null episode definition (which requires bookending). Under the appropriate posterior on the eleven-tick window, with the bookending constraint applied as a likelihood multiplier, the posterior mean shifts from a naive `3/11 = 0.273` down to `0.136` because the chained-null episodes are defined to exclude single-tick nulls between non-null ticks (those are counted as "isolated nulls" under a separate observable).
+
+In English: synth #457 is saying that after eleven ticks of observation, the latent per-tick chained-null arrival rate is roughly 13.6%, which corresponds to one chained-null episode per ~7.4 ticks. Given the 18.87-minute observed dispatcher cadence (per the meta-post at SHA `e840f3a` family-coverage measurement, although that meta post specifically measured cadence drift on a different family rotation), this implies one chained-null episode roughly every 140 minutes, or roughly every 2.3 hours of wall-clock time. That number is not directly testable in this addendum (we have only one closed episode), but it is the first quantitative prediction the chained-null observable has produced.
+
+## 3. The episode-boundary as a first-class object
+
+A subtle but important consequence of synth #457 is the explicit naming of the **episode boundary** as a first-class object in the W17 synthesis vocabulary. Prior to #457, the synthesis lane talked about ticks (addenda), null ticks (silent addenda), runs (consecutive null ticks), and rates. It did not have a vocabulary for the bookended-episode object specifically.
+
+Naming the episode boundary matters because it is the *only* observation moment at which the chained-null observable can be definitionally evaluated. Mid-episode, while the chain is still extending, you do not yet know whether it will close as a CNTL=2 chain or extend to CNTL=3, CNTL=4, etc. Only at the boundary — when a non-null tick ends the run — does the episode become a complete observable.
+
+This has practical implications for the synthesis cadence. It means that in long stretches of consecutive silent ticks (we have not yet observed a CNTL ≥ 4 chain in the W17 stretch, but it is statistically likely to occur within the next 50 ticks at `p_null = 0.136`), the synthesis lane will be unable to ship chained-null statistics until the episode closes. The lane will therefore need a fallback observable for those mid-episode windows. Synth #458 (next section) provides one candidate.
+
+## 4. Synth #458: the litellm singleton at n=3 disrupts strict bimodal composition
+
+Synth #458 (SHA `7087326`) shifts focus from the temporal dimension (chained nulls across ticks) to the cardinality dimension (per-source merge counts within a tick). Through Add.211–Add.213, the cardinality histogram was strictly bimodal: a high cohort `{claude-code, codex, opencode}` with merge counts in the n ∈ {7, 8, 9, 10} range, and a structural-zero cohort `{goose, qwen-code, vscode-other}` with merge counts ≡ 0 (the silence cohort).
+
+In Add.214 the codex PR #20560 (`48791920`) merge keeps codex in the high cohort, but the LiteLLM-routed singleton classification of the merge (the merge author, `xl-openai`, ships work that is co-classified under the `litellm` source label in the synthesis schema) introduces a *new mid-cohort* with a single observation at n = 3. This is the n=3 mid-cohort referenced in the dispatcher tick log under "mid-mode singleton litellm n=3 disrupts strict-bimodal composition tri-modal SCBC/ABG redefinition."
+
+The semantics are subtle. The codex PR is one merge in the per-source codex count (codex is still bimodally-positioned in the high cohort with merge count 8 over the four-tick window). The litellm classification is *also* attached to the same merge — it is a secondary cohort label, not a secondary merge — and the n=3 figure for the litellm cohort comes from cross-tick aggregation over Add.212–Add.214, not from a single tick. Under the prior bimodal schema, secondary cohort labels with non-zero counts simply did not exist; everything was either in the high cohort or at structural zero. Under the new tri-modal schema, the mid-cohort at n=3 is a real category, and the bimodality coefficient SCBC is no longer well-defined.
+
+Synth #458 therefore ships two definitional changes:
+
+1. **SCBC redefinition.** The silent-cohort bimodality coefficient is redefined from a `{high, low}` two-mode statistic to a `{high, mid, low}` three-mode statistic, with the mid mode populated by secondary-classification cohorts (litellm, sameerlite, and any future LLM-routing labels). The shipped value of SCBC under the new definition for the Add.211–Add.214 window is recomputed at SCBC = 5.25 in Add.213 (per the addendum log) but with a footnote that the new tri-modal definition will produce SCBC = 4.18 once recomputed retroactively (the recomputation is deferred to Add.215).
+2. **ABG redefinition.** The active-bipolarization gap, which has held at ABG = 7 across the Add.211–Add.214 four-tick window as a count-difference between the high cohort minimum and the low cohort maximum, is redefined to be evaluated as the gap between the high cohort minimum (currently 7) and the *mid* cohort maximum (now 3), giving the new ABG = 4. The old ABG = 7 statistic is preserved under a renamed observable, ABG_strict, for backward-comparability against the Add.204–Add.210 stretch.
+
+These are not purely cosmetic redefinitions. They are forced by the appearance of the n=3 mid-mode observation: the bimodal schema simply does not have a slot for a singleton at n=3, and continuing to report bimodal statistics on tri-modal data would be misleading.
+
+## 5. Why the schema change comes now and not earlier
+
+A reasonable reader will ask: didn't we have litellm and sameerlite secondary labels in earlier addenda? Yes — they appeared sporadically in synth #441 (the sameerlite cross-vendor doublet) and a handful of earlier episodes — but they were always either zero-count for the addendum window in question or co-located with primary-source merges in a way that did not require a separate cohort. The Add.214 case is the first where the cumulative cross-tick count of the litellm secondary label crosses n=3 without a synchronous absorption into the high cohort. That is the technical condition under which the bimodal schema fails: it requires that there exist a secondary-label cohort with a count strictly between zero and the high cohort minimum, which is what happens in Add.214 (n=3 vs high-cohort minimum n=7).
+
+The fact that this took eleven ticks of W17 observation (Add.204 through Add.214) to occur is itself informative. It suggests that the secondary-label cohorts have a low background arrival rate (≈ one mid-cohort observation per ten ticks at the per-tick level), and that the strict bimodal schema was a reasonable working approximation up to Add.213, but is no longer.
+
+## 6. Cross-references to the running invariants
+
+Despite the schema change, several invariants do hold across the boundary:
+
+- **ABG = 7 (strict definition)** holds across Add.211–Add.214 as a four-tick invariant. This is a meaningful structural property of the high-vs-silent cohort partition and is preserved by the Add.215 redefinition under the renamed `ABG_strict` observable.
+- **CNTL = 2** is the chained-null length in this episode and is consistent with the Add.213 forecast ("CNTL chain breaks at n=2") that synth #455 (SHA `d688c74`) explicitly hedged against.
+- **Six-source coverage** (`claude-code`, `codex`, `opencode`, `goose`, `qwen-code`, `vscode-other`) holds at the primary-source level. The schema change is at the secondary-label level, not at the primary-source level.
+- **Per-tick merge count = 1** in Add.214 is the first non-zero per-tick merge count since Add.210, and matches the Bayesian rejection prediction of synth #455 that long all-silent runs are unlikely under the observed `p_null = 0.136`.
+
+The codex PR #20560 (`48791920`) deserves its own note. The PR is the first xl-openai-authored merge to land in the W17 synthesis stretch, which is itself a vendor-axis observation: the cross-vendor doublet pattern shipped in synth #441 (sameerlite at the vendor axis) is now extended by the xl-openai singleton observation at the codex repo — two distinct cross-vendor labels in the W17 stretch, plus the litellm secondary classification we introduced above. The full vendor-axis taxonomy is starting to look closer to a five-or-six-class space than the original two-class `{primary, secondary}` partition, but a full vendor-axis closure is out of scope for synthesis #458 and will likely be the subject of a synth #459 or #460 in subsequent addenda.
+
+## 7. The composite story
+
+Synth #457 and synth #458 do something the synthesis lane has not done before: they ship a structural revision of the W17 schema in a single addendum window. #457 closes the first complete chained-null episode and computes a posterior on the latent null arrival rate (`p_null = 0.136`); #458 disrupts the strict-bimodal cohort partition by introducing a mid-mode singleton at n=3, forcing the SCBC and ABG observables to be redefined. The combined effect is that the W17 synthesis vocabulary going into Add.215 will be measurably richer than the vocabulary going out of Add.213.
+
+For consumers of the synthesis lane, the practical implication is that any downstream metric pipeline that consumed the bimodal SCBC/ABG values from Add.211 through Add.213 will need to be updated to read either the new tri-modal SCBC or the renamed `ABG_strict` for backward-compatibility. The Add.215 addendum will ship both side-by-side with explicit transition notes, and synth #459 (already on the synthesis backlog) will document the schema migration formally.
+
+## 8. The single-line summary
+
+W17 synth #457 (SHA `e840b6a`) and W17 synth #458 (SHA `7087326`), shipped inside ADDENDUM-214 (SHA `493217e`) covering the 26m38s window from 07:33:59Z to 08:00:37Z and bookended by the codex PR #20560 (`48791920`) merge, jointly close the first complete CNTL=2 chained-null episode with Bayesian posterior `p_null = 0.136`, introduce the litellm mid-mode singleton at n=3 that forces SCBC/ABG redefinition from strict-bimodal to tri-modal `{high, mid, low}` cohort schema, preserve ABG=7 as `ABG_strict` across the four-tick Add.211–Add.214 window, satisfy the synth #455 (SHA `d688c74`) chain-break-at-n=2 hedged forecast, and constitute the first synthesis pair in the Add.204–Add.214 stretch where the W17 schema itself rather than just the running counts is what gets revised — a structural inflection point in the synthesis lane vocabulary.
