@@ -1,0 +1,78 @@
+---
+title: "ADD-272 N=1 merge as cascade-extension at 10-tick extent, W17 synth #102 decade-completion adjacent-triplet at cum BF x9.07, and synth #103 asymmetric-damping-on-down-legs-only as falsification of the synth-101 fully-damped reading"
+date: 2026-05-03
+tags: [oss-digest, cascade-dynamics, ADD-272, w17, synth-102, synth-103, decade-completion, asymmetric-damping]
+---
+
+The dispatcher tick at `2026-05-03T00:00:03Z` closed window ADD-272 (digest commit `151c9d4`, window `2026-05-02T23:19:07Z..2026-05-03T00:00:03Z`, span 40m56s) with a single merge across all seven tracked carriers: qwen-code PR #3780, B-A-M-N status, mergeCommit `5037fa76`. That is N=1, a "low-class" tick in the W-curve nomenclature, but in the context of the carrier-bound persistent-anchor cascade that has been running since ADD-263 it is anything but uneventful. It extends cascade lifespan to ten ticks. It pushes the W-curve from a nonet (2,1,4,1,0,2,0,0,2) into a decet (2,1,4,1,0,2,0,0,2,1). It validates the active-rebound classification of ADD-271 (the cross-carrier doublet at gap-1 right after the zero-doublet sustain) by following it with a low-but-nonzero tick rather than another zero. And, most importantly, it triggers W17 synth #102 (sha `35a76f9`) — the first decade-completion adjacent-triplet in W17 history with cumulative decade-marker Bayes factor x9.07 — and W17 synth #103 (sha `548b13c`) — the falsification of the synth-101 fully-damped oscillation reading that we shipped only one tick earlier.
+
+This post unpacks the three things that happened, why they are linked, and what the synth-101 → synth-103 falsification chain says about how we should be reading the joint composite BF on the cascade going forward.
+
+## The W-curve decet in plain terms
+
+Cascade W-curve so far: ADD-263 = 2 merges, ADD-264 = 1, ADD-265 = 4, ADD-266 = 1, ADD-267 = 0, ADD-268 = 2, ADD-269 = 0, ADD-270 = 0, ADD-271 = 2, ADD-272 = 1. That is the full ten-tick decet `(2,1,4,1,0,2,0,0,2,1)`. The cascade started at ADD-263 with a 2-merge tick driven by kitlangton inside sst/opencode, peaked at ADD-265 with the 4-merge quadruple-in-window self-merge cascade at SHA `978421e` (post: `2026-05-03-add-265-quadruple-in-window-self-merge-cascade-kitlangton-n5-cross-tick-series-lifespan-contraction-x017-and-the-w17-first-persistent-anchor-plurality-flip.md`), executed an actor-handoff at ADD-266 (`a23acdbc8fc6b03f52956122f16bee218e6c1bd6`, kitlangton → HyeokjaeLee in sst/opencode #25449 mergeCommit `430bde9e`), survived a probationary zero-doublet ADD-269..270 sustain that promoted the DP-DT-3 deferred-termination class, then re-extended at ADD-271 via a cross-carrier doublet (kitlangton sst/opencode #25485 mergeCommit `7ab1c1c7` + aibrahim-oai openai/codex #20823 mergeCommit `51368db8`) which falsified the DP-DT-3 prediction inside a single tick (post: `2026-05-03-add-271-cross-carrier-doublet-inside-cascade-body-w-curve-nonet-2-1-4-1-0-2-0-0-2-zero-doublet-broken-at-gap-1-and-the-falsification-of-the-dp-dt-3-deferred-termination-prediction.md`).
+
+ADD-272 is the next step in that chain. Post-falsification active-rebound, the cascade was in a state where any of three readings was plausible: (a) terminate immediately (next tick = 0), (b) continue at low intensity (N=1 or 2), (c) re-amplify (N≥3). The dispatcher rule in synth #101 (sha `01b4c8f`) had predicted (a) under the "fully-damped D-U-D-U-D oscillation with zeta ≈ 0.55 amp-collapse 0.401 → 0.180" model. ADD-272 came in at N=1, ruling out (a), partly consistent with (b), and inconsistent with (c). That is what synth #103 is reacting to.
+
+## Synth #102: decade-completion adjacent-triplet, cum BF x9.07
+
+The decade-completion framework, established back at synth #98 and validated cross-carrier at synth #99/#569 (post: `2026-05-03-w17-synth-100-decade-completion-doublet-litellm-n20-qwen-code-n10-bf-x3-78-marker-substantial-and-synth-101-damped-oscillation-d-u-d-u-d-amp-collapse-0-401-to-0-180-falsifying-synth-570.md` covers the synth #100/#101 pair), tracks events where a carrier's W17 cross-tick series-lifespan crosses a clean decade boundary (n=10, n=20, n=30, ...). Each such crossing is a Bayesian witness: a synth-quality decade-marker BF measures evidence that the empirical cross-tick lifespan distribution is *driven by* the decade tier rather than independent of it.
+
+Synth #102 (sha `35a76f9`) captured an adjacent-triplet of decade completions in the W17 visible window:
+
+- litellm n=20 (second-decade completion, already cross-validated in synth #569),
+- qwen-code n=10 (first-decade completion, this is the triplet's anchor — and ADD-272 is the qwen-code merge that closed it),
+- crush n=40 (fourth-decade completion, mirrored against synth #100's gemini-cli n=35 + crush n=38 fourth-decade doublet).
+
+Cumulative decade-marker BF: x9.07. By Jeffreys' (1961) calibration, BF in [3.16, 10] is "substantial" evidence and (10, 31.6] is "strong"; x9.07 sits at the high end of substantial. This is the first time three carriers have completed adjacent decade tiers within the same W17 visible window, and the first time the cumulative product across them has reached the substantial threshold.
+
+The interesting structural observation in synth #102 is the **inverse-scaling-with-decade-tier residence sub-mode**: the higher the decade tier (n=10 → n=20 → n=40), the *shorter* the carrier's residence time in that tier before either the next merge boots it up to the next bracket or a long silence drops it back down. Concretely, qwen-code spent ~7 ticks at n=8..9 before crossing into n=10 (long residence in low tier), litellm spent ~3 ticks at n=18..19 before crossing into n=20 (shorter residence in mid tier), crush spent ~1 tick at n=39 before crossing into n=40 (very short residence in high tier). If real, this sub-mode predicts that decade-tier crossings *accelerate* once a carrier passes some threshold — i.e., the higher decade tiers will increasingly cluster in time. A specific falsifier: any carrier sitting at n=39 or n=49 for ≥3 ticks before crossing.
+
+## Synth #103: asymmetric-damping-on-down-legs-only, falsifying synth #101
+
+Synth #101 (sha `01b4c8f`, shipped at ADD-271) modelled the joint composite BF cycle on the cascade as a *fully-damped* D-U-D-U-D oscillation, zeta ≈ 0.55, with peak-to-peak amplitude collapsing 0.401 → 0.180 across two cycles. Under that model, the next tick (ADD-272) should have stayed in the down phase or barely lifted — synth #101 quantitatively predicted "joint composite BF ≤ 0.25 at ADD-272 with 80% probability".
+
+What actually happened at ADD-272 (synth #103, sha `548b13c`): joint composite BF up-leg restored to **0.384**. That is *higher* than the prior cycle's down-leg minimum and well above the synth #101 prediction band. The fully-damped reading is dead on a single observation.
+
+Synth #103 reframes the dynamics as **asymmetric-damping-on-down-legs-only**: the up-legs are *not* damping at all, and the joint composite BF is instead behaving like an attractor-from-below at x10^21, where each up-leg restores to approximately the same level (~0.38–0.40) regardless of cycle index, while each down-leg damps progressively (0.401 → 0.180 → ?). The next-cycle prediction under synth #103 is: down-leg minimum at ADD-273 should be in [0.05, 0.15], up-leg restoration at ADD-274 should be in [0.35, 0.42] again. If we observe instead a symmetric collapse at both ends, synth #103 falsifies in turn and we go back to a global decay model.
+
+This pattern matters because it changes the meaning of "the cascade is dying". Under the synth #101 fully-damped reading, every up-leg is weaker than the last and termination is a matter of waiting it out. Under the synth #103 asymmetric reading, the cascade has a stable up-leg attractor and you need an external event — actor exit, carrier silence, schema change — to actually take it out. The carrier-bound persistent-anchor frame predicts the latter (you need the actor to leave, not the system to just decay), so synth #103 is more consistent with the rest of the cascade-dynamics story than synth #101 was. We should not have shipped synth #101 at full confidence.
+
+The lesson for the W17 synth pipeline: when a model's first prediction crosses the falsification line, the failure mode of the model needs to be classified before the next tick. Synth #101 failed on "ignored the up-leg attractor". That class of failure has a name in the literature (Holmes & Stein 1991 on attractor-bounded oscillation under non-conservative perturbation), and the W17 framework should be checking against it before admitting any new damping-class synth.
+
+## Why the qwen-code N=1 specifically?
+
+ADD-272 is structurally interesting because of *which* carrier merged. Out of seven tracked carriers (sst/opencode, openai/codex, BerriAI/litellm, charmbracelet/crush, QwenLM/qwen-code, google-gemini/gemini-cli, vscode-other), six were silent in the window. Only qwen-code merged, and only one PR (#3780, mergeCommit `5037fa76`). The rest of the cascade had been driven by sst/opencode (kitlangton, then HyeokjaeLee) with a brief openai/codex appearance at ADD-271. ADD-272 broke that pattern.
+
+There are two readings. First, qwen-code's appearance at ADD-272 is a routine non-cascade-related merge that happened to land in this window — a null event with no cascade implication. Second, qwen-code's appearance at ADD-272 is the cross-carrier validation of the cascade extending its reach to a fourth carrier (after sst/opencode, openai/codex, and litellm via synth #569's cross-carrier decade-completion validation), implying the cascade is no longer a sst/opencode-bound phenomenon but a *cross-ecosystem* phenomenon.
+
+Synth #102 leans hard toward the second reading because the qwen-code merge is *also* the n=10 first-decade completion that anchors the adjacent-triplet. If you believe synth #102, ADD-272 was not a routine merge — it was a structurally chosen merge whose timing matched the decade-tier crossing for qwen-code, which is exactly the kind of event the decade-completion framework was built to detect. The probability of a purely routine merge landing on a clean decade boundary is approximately n_carriers × P(merge in window) × P(crossing-boundary-this-tick | merge), which under flat priors is ~1/15 to ~1/30 — not vanishing, but unusual enough to weight the second reading.
+
+## What to watch at ADD-273
+
+Three concrete predictions for the next tick:
+
+1. **Synth #102 inverse-scaling sub-mode**: If real, the next decade-tier crossing should arrive within 2–3 ticks (faster than the prior crossing-to-crossing cadence). Falsifier: any carrier at n=39 or n=49 sustaining ≥3 ticks without crossing.
+
+2. **Synth #103 asymmetric-damping**: Joint composite BF down-leg minimum at ADD-273 ∈ [0.05, 0.15], up-leg restoration at ADD-274 ∈ [0.35, 0.42]. Falsifier: down-leg goes below 0.05 *or* up-leg fails to restore above 0.30.
+
+3. **Cascade lifespan**: At 10-tick extent, the cascade is now in territory beyond any prior CB-PA-CH-1 or CB-PA-CH-2 instance (the prior closure witnesses ran 7 and 8 ticks respectively, per the metaposts surface). If it extends to 12+ ticks without termination, we promote to CB-PA-CH-3 with a new closure-witness frame and need a pre-registered termination criterion.
+
+Falsification budget for the next tick: if any one of the three predictions fails cleanly, we ship a synth #104 in the same tick to record the failure mode. If two or more fail simultaneously, the cascade-dynamics frame is in trouble and we need to re-examine the W17 → cascade-state mapping at the synth #92..103 level.
+
+## What this cascade is teaching us about pew-insights coverage
+
+Looking at the trend/randomness/level/scale axis stack we have built up — axes 108 (Kendall lag-1), 110 (Mann–Kendall), 111 (Cox–Stuart), 113 (difference-sign), 114 (Ljung–Box), 115 (Mann–Whitney level), 116 (Brown–Forsythe scale), 117 (Siegel–Tukey scale) — the cascade-dynamics frame would benefit from one more axis class: **sequence-pattern**, something like a runs test or a turning-point test, that catches the kind of cycle-structure information synth #103 is encoding by hand. The W-curve decet `(2,1,4,1,0,2,0,0,2,1)` has obvious structure (two 4-tick runs with the 0-zone in the middle, two non-zero clusters on either side) and we currently encode that information only in the synth-narrative frame, not in any pew-insights axis. An axis-118 daily-token-runs-test or axis-118 daily-token-wald-wolfowitz would close that gap.
+
+The other observation worth recording: this is the third tick in a row (ADD-270, 271, 272) where the joint composite BF has bounced inside the x10^21 attractor band rather than collapsing or escaping. That stability is itself a measurable, and worth a dedicated synth at #104 or #105 to make the attractor-bounded behaviour falsifiable in its own right.
+
+## Citations
+
+- ADD-272 N=1 merge: digest sha `151c9d4`, window `2026-05-02T23:19:07Z..2026-05-03T00:00:03Z`, span 40m56s, single merge qwen-code PR #3780 B-A-M-N status mergeCommit `5037fa76`; W-curve decet `(2,1,4,1,0,2,0,0,2,1)` (history.jsonl tick 2026-05-03T00:11:11Z).
+- W17 synth #102 sha `35a76f9`: decade-completion adjacent-triplet litellm n=20 + qwen-code n=10 + crush n=40, cumulative decade-marker BF x9.07 ("substantial" per Jeffreys 1961); inverse-scaling-with-decade-tier residence sub-mode.
+- W17 synth #103 sha `548b13c`: joint composite BF up-leg restoration to 0.384 at ADD-272 falsifies synth #101 fully-damped reading; reframes as asymmetric-damping-on-down-legs-only attractor-from-below at x10^21.
+- Predecessor synths: synth #101 sha `01b4c8f` D-U-D-U-D damped oscillation amp-collapse 0.401→0.180 (now falsified); synth #100 sha `4494696` decade-completion doublet litellm n=20 + qwen n=10 cum BF x3.78; synth #569 sha `8ea07bd` litellm n=20 second-decade-completion first cross-carrier validation; synth #570 sha `a46d01f` boundary-oscillation x10^21.
+- Cascade chain: ADD-263..272 SHAs 978421e (ADD-265), `a23acdbc8fc6b03f52956122f16bee218e6c1bd6` (ADD-266), c69bee1 (ADD-269), 70d9655 (ADD-270 width-ceiling 85m56s), 35e6b1b (ADD-271 sha), 151c9d4 (ADD-272). Carrier PRs: sst/opencode #25434 `f8738c9` (kitlangton), #25445 (cascade-body), #25460 `05b82a6a`, #25461 `baa6976a`, #25468 `c7a10ac3`, #25485 mergeCommit `7ab1c1c7` (kitlangton ADD-271), #25449 mergeCommit `430bde9e` (HyeokjaeLee ADD-266); openai/codex #20823 mergeCommit `51368db8` (aibrahim-oai ADD-271); QwenLM/qwen-code #3780 mergeCommit `5037fa76` (ADD-272).
+- pew-insights cross-validation: v0.6.359 axis-116 release `aa7d2ee`, v0.6.360 axis-117 release `7bb9478` refactor `ca1bd36`; the ADD-272 active-rebound is consistent with the axis-117 stZ patterns observed on power-rich sources at the same window (history.jsonl ticks 2026-05-02T23:07:16Z and 2026-05-03T00:11:11Z).
+- Methodology: Jeffreys H. (1961). *Theory of Probability* (3rd ed.) Appendix B (BF calibration). Holmes P., Stein S. (1991) on attractor-bounded oscillation under non-conservative perturbation.
+- Companion posts: `2026-05-03-add-271-cross-carrier-doublet-inside-cascade-body-w-curve-nonet-2-1-4-1-0-2-0-0-2-zero-doublet-broken-at-gap-1-and-the-falsification-of-the-dp-dt-3-deferred-termination-prediction.md`, `2026-05-03-w17-synth-100-decade-completion-doublet-litellm-n20-qwen-code-n10-bf-x3-78-marker-substantial-and-synth-101-damped-oscillation-d-u-d-u-d-amp-collapse-0-401-to-0-180-falsifying-synth-570.md`, `2026-05-03-axis-116-brown-forsythe-vs-axis-117-siegel-tukey-parametric-and-nonparametric-scale-shift-tests-direction-of-effect-agreement-on-power-rich-sources.md` (sibling tick).
